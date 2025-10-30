@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FunPark Ticketsystem</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🎢 FunPark – Dein Abenteuer wartet!</h1>
+    <nav>
+      <button onclick="showSection('buy')">🎟️ Ticket kaufen</button>
+      <button onclick="showSection('view')">💳 Ticket anzeigen</button>
+      <button onclick="showSection('redeem')">✅ Ticket einlösen</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Ticket kaufen -->
+    <section id="buy" class="visible">
+      <h2>🎟️ Ticket kaufen</h2>
+      <form id="buyForm">
+        <label>Benutzername:</label>
+        <select id="userSelect"></select>
+
+        <label>Ticket-Typ:</label>
+        <select id="ticketType">
+          <option value="Tagesticket">Tagesticket – 35€</option>
+          <option value="2-Tage-Ticket">2-Tage-Ticket – 60€</option>
+          <option value="Familien-Ticket">Familien-Ticket – 90€</option>
+        </select>
+
+        <button type="submit">Kaufen</button>
+      </form>
+      <div id="buyMessage" class="message"></div>
+    </section>
+
+    <!-- Ticket anzeigen -->
+    <section id="view">
+      <h2>💳 Ticket anzeigen</h2>
+      <form id="viewForm">
+        <label>Benutzername:</label>
+        <select id="userSelectView"></select>
+        <button type="submit">Anzeigen</button>
+      </form>
+      <div id="ticketList"></div>
+    </section>
+
+    <!-- Ticket einlösen -->
+    <section id="redeem">
+      <h2>✅ Ticket einlösen</h2>
+      <form id="redeemForm">
+        <label>Ticketnummer eingeben:</label>
+        <input type="text" id="ticketCode" placeholder="z. B. TCK-123456" required>
+        <button type="submit">Einlösen</button>
+      </form>
+      <div id="redeemMessage" class="message"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 FunPark – Ticketsystem Demo</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
