@@ -10,28 +10,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
-
 <body>
 <!-- Zahlungsmodal -->
-<div id="paymentModal" class="modal">
+<div id="paymentModal" class="modal" aria-hidden="true">
   <div class="modal-content">
-    <span class="close">&times;</span>
+    <button class="close" aria-label="Schließen">&times;</button>
     <h2>💳 Zahlung über PayFun (Demo)</h2>
     <div id="paymentInfo"></div>
 
     <!-- Zahlungsformular (Demo, vorausgefüllt & gesperrt) -->
     <form id="paymentForm">
-      <label>Name auf Karte:</label>
-      <input type="text" value="Max Mustermann" readonly>
+      <label for="cardName">Name auf Karte:</label>
+      <input type="text" id="cardName" value="Max Mustermann" readonly>
 
-      <label>Kartennummer:</label>
-      <input type="text" value="1234 5678 9012 3456" readonly>
+      <label for="cardNumber">Kartennummer:</label>
+      <input type="text" id="cardNumber" value="1234 5678 9012 3456" readonly>
 
-      <label>Gültig bis:</label>
-      <input type="text" value="12/25" readonly>
+      <label for="cardExpiry">Gültig bis:</label>
+      <input type="text" id="cardExpiry" value="12/25" readonly>
 
-      <label>CVC:</label>
-      <input type="text" value="123" readonly>
+      <label for="cardCVC">CVC:</label>
+      <input type="text" id="cardCVC" value="123" readonly>
 
       <button type="submit">Zahlung durchführen ✅</button>
     </form>
@@ -40,154 +39,153 @@
   </div>
 </div>
 
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="logo-area">
+    <h1>🎢 FunPark</h1>
+    <p>Das ultimative Abenteuer für Groß & Klein!</p>
+  </div>
+  <nav>
+    <button type="button" onclick="showSection('home')">🏠 Start</button>
+    <button type="button" onclick="showSection('buy')">🎟️ Tickets</button>
+    <button type="button" onclick="showSection('view')">💳 Ticket anzeigen</button>
+    <button type="button" onclick="showSection('redeem')">✅ Ticket einlösen</button>
+    <button type="button" onclick="showSection('gallery')">📸 Galerie</button>
+    <button type="button" onclick="showSection('faq')">❓ FAQ</button>
+    <button type="button" onclick="showSection('contact')">📬 Kontakt</button>
+  </nav>
+</header>
 
-  <!-- ================= HEADER ================= -->
-  <header>
-    <div class="logo-area">
-      <h1>🎢 FunPark</h1>
-      <p>Das ultimative Abenteuer für Groß & Klein!</p>
+<!-- ================= MAIN ================= -->
+<main>
+  <!-- 🏠 HOME -->
+  <section id="home" class="visible">
+    <div class="hero">
+      <h2>Willkommen im FunPark!</h2>
+      <p>Erlebe Nervenkitzel, Spaß und Abenteuer – an nur einem Ort. Egal ob Achterbahnen, Shows oder Wasserspaß – bei uns ist für alle etwas dabei!</p>
+      <button onclick="showSection('buy')" class="cta">Jetzt Ticket sichern 🎟️</button>
     </div>
-    <nav>
-      <button onclick="showSection('home')">🏠 Start</button>
-      <button onclick="showSection('buy')">🎟️ Tickets</button>
-      <button onclick="showSection('view')">💳 Ticket anzeigen</button>
-      <button onclick="showSection('redeem')">✅ Ticket einlösen</button>
-      <button onclick="showSection('gallery')">📸 Galerie</button>
-      <button onclick="showSection('faq')">❓ FAQ</button>
-      <button onclick="showSection('contact')">📬 Kontakt</button>
-    </nav>
-  </header>
 
-  <!-- ================= MAIN ================= -->
-  <main>
-    <!-- 🏠 HOME -->
-    <section id="home" class="visible">
-      <div class="hero">
-        <h2>Willkommen im FunPark!</h2>
-        <p>Erlebe Nervenkitzel, Spaß und Abenteuer – an nur einem Ort. Egal ob Achterbahnen, Shows oder Wasserspaß – bei uns ist für alle etwas dabei!</p>
-        <button onclick="showSection('buy')" class="cta">Jetzt Ticket sichern 🎟️</button>
-      </div>
+    <div class="info-grid">
+      <article class="info-card">
+        <h3>🎢 Attraktionen</h3>
+        <p>Über 40 Fahrgeschäfte, darunter unsere legendäre Holzachterbahn „ThunderRide“ und das 4D-Erlebnis „Galaxy Flight“!</p>
+      </article>
+      <article class="info-card">
+        <h3>🍔 Gastronomie</h3>
+        <p>Von Burgern bis Veggie Bowls – entdecke über 20 Restaurants & Snackbars im gesamten Park.</p>
+      </article>
+      <article class="info-card">
+        <h3>👨‍👩‍👧‍👦 Familienfreundlich</h3>
+        <p>Kinderbereiche, Familien-Tickets und Wickelstationen – der Spaß für die ganze Familie!</p>
+      </article>
+    </div>
+  </section>
 
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>🎢 Attraktionen</h3>
-          <p>Über 40 Fahrgeschäfte, darunter unsere legendäre Holzachterbahn „ThunderRide“ und das 4D-Erlebnis „Galaxy Flight“!</p>
-        </div>
-        <div class="info-card">
-          <h3>🍔 Gastronomie</h3>
-          <p>Von Burgern bis Veggie Bowls – entdecke über 20 Restaurants & Snackbars im gesamten Park.</p>
-        </div>
-        <div class="info-card">
-          <h3>👨‍👩‍👧‍👦 Familienfreundlich</h3>
-          <p>Kinderbereiche, Familien-Tickets und Wickelstationen – der Spaß für die ganze Familie!</p>
-        </div>
-      </div>
-    </section>
+  <!-- 🎟️ TICKET KAUFEN -->
+  <section id="buy">
+    <h2>🎟️ Ticket kaufen</h2>
+    <form id="buyForm">
+      <label for="userSelect">Benutzername:</label>
+      <select id="userSelect"></select>
 
-    <!-- 🎟️ TICKET KAUFEN -->
-    <section id="buy">
-      <h2>🎟️ Ticket kaufen</h2>
-      <form id="buyForm">
-        <label>Benutzername:</label>
-        <select id="userSelect"></select>
+      <label for="ticketType">Ticket-Typ:</label>
+      <select id="ticketType">
+        <option value="Tagesticket">Tagesticket – 35€</option>
+        <option value="2-Tage-Ticket">2-Tage-Ticket – 60€</option>
+        <option value="Familien-Ticket">Familien-Ticket – 90€</option>
+        <option value="VIP-Ticket">VIP-Ticket – 150€ (mit Fast Lane)</option>
+      </select>
 
-        <label>Ticket-Typ:</label>
-        <select id="ticketType">
-          <option value="Tagesticket">Tagesticket – 35€</option>
-          <option value="2-Tage-Ticket">2-Tage-Ticket – 60€</option>
-          <option value="Familien-Ticket">Familien-Ticket – 90€</option>
-          <option value="VIP-Ticket">VIP-Ticket – 150€ (mit Fast Lane)</option>
-        </select>
+      <label for="paymentMethod">Zahlungsmethode:</label>
+      <select id="paymentMethod">
+        <option value="Kreditkarte">Kreditkarte</option>
+        <option value="PayPal">PayPal</option>
+        <option value="EC-Karte">EC-Karte</option>
+      </select>
 
-        <label>Zahlungsmethode:</label>
-        <select>
-          <option>Kreditkarte</option>
-          <option>PayPal</option>
-          <option>EC-Karte</option>
-        </select>
+      <button type="submit">Ticket kaufen 💳</button>
+    </form>
+    <div id="buyMessage" class="message" role="status"></div>
+  </section>
 
-        <button type="submit">Ticket kaufen 💳</button>
-      </form>
-      <div id="buyMessage" class="message"></div>
-    </section>
+  <!-- 💳 TICKET ANZEIGEN -->
+  <section id="view">
+    <h2>💳 Ticket anzeigen</h2>
+    <form id="viewForm">
+      <label for="userSelectView">Benutzername:</label>
+      <select id="userSelectView"></select>
+      <button type="submit">Anzeigen</button>
+    </form>
+    <div id="ticketList" role="region" aria-live="polite"></div>
+  </section>
 
-    <!-- 💳 TICKET ANZEIGEN -->
-    <section id="view">
-      <h2>💳 Ticket anzeigen</h2>
-      <form id="viewForm">
-        <label>Benutzername:</label>
-        <select id="userSelectView"></select>
-        <button type="submit">Anzeigen</button>
-      </form>
-      <div id="ticketList"></div>
-    </section>
+  <!-- ✅ TICKET EINLÖSEN -->
+  <section id="redeem">
+    <h2>✅ Ticket einlösen</h2>
+    <form id="redeemForm">
+      <label for="ticketCode">Ticketnummer eingeben:</label>
+      <input type="text" id="ticketCode" placeholder="z. B. TCK-123456" required>
+      <button type="submit">Einlösen</button>
+    </form>
+    <div id="redeemMessage" class="message" role="status"></div>
+  </section>
 
-    <!-- ✅ TICKET EINLÖSEN -->
-    <section id="redeem">
-      <h2>✅ Ticket einlösen</h2>
-      <form id="redeemForm">
-        <label>Ticketnummer eingeben:</label>
-        <input type="text" id="ticketCode" placeholder="z. B. TCK-123456" required>
-        <button type="submit">Einlösen</button>
-      </form>
-      <div id="redeemMessage" class="message"></div>
-    </section>
+  <!-- 📸 GALERIE -->
+  <section id="gallery">
+    <h2>📸 Eindrücke aus dem FunPark</h2>
+    <div class="gallery-grid">
+      <img src="https://source.unsplash.com/400x250/?rollercoaster" alt="Achterbahn">
+      <img src="https://source.unsplash.com/400x250/?themepark" alt="Freizeitpark">
+      <img src="https://source.unsplash.com/400x250/?ferriswheel" alt="Riesenrad">
+      <img src="https://source.unsplash.com/400x250/?waterpark" alt="Wasserrutsche">
+      <img src="https://source.unsplash.com/400x250/?children,fun" alt="Familienbereich">
+      <img src="https://source.unsplash.com/400x250/?fireworks,night" alt="Abendshow">
+    </div>
+  </section>
 
-    <!-- 📸 GALERIE -->
-    <section id="gallery">
-      <h2>📸 Eindrücke aus dem FunPark</h2>
-      <div class="gallery-grid">
-        <img src="https://source.unsplash.com/400x250/?rollercoaster" alt="Achterbahn">
-        <img src="https://source.unsplash.com/400x250/?themepark" alt="Freizeitpark">
-        <img src="https://source.unsplash.com/400x250/?ferriswheel" alt="Riesenrad">
-        <img src="https://source.unsplash.com/400x250/?waterpark" alt="Wasserrutsche">
-        <img src="https://source.unsplash.com/400x250/?children,fun" alt="Familienbereich">
-        <img src="https://source.unsplash.com/400x250/?fireworks,night" alt="Abendshow">
-      </div>
-    </section>
+  <!-- ❓ FAQ -->
+  <section id="faq">
+    <h2>❓ Häufige Fragen</h2>
+    <details>
+      <summary>Kann ich Tickets stornieren?</summary>
+      <p>Nein, bereits gekaufte Tickets sind vom Umtausch ausgeschlossen, können aber auf andere Personen übertragen werden.</p>
+    </details>
+    <details>
+      <summary>Gibt es Parkplätze?</summary>
+      <p>Ja, wir haben über 2000 kostenlose Parkplätze direkt am Eingang!</p>
+    </details>
+    <details>
+      <summary>Darf ich Essen mitbringen?</summary>
+      <p>Ja, du darfst eigene Snacks mitbringen – bitte achte nur auf Mülltrennung und Sauberkeit.</p>
+    </details>
+  </section>
 
-    <!-- ❓ FAQ -->
-    <section id="faq">
-      <h2>❓ Häufige Fragen</h2>
-      <details>
-        <summary>Kann ich Tickets stornieren?</summary>
-        <p>Nein, bereits gekaufte Tickets sind vom Umtausch ausgeschlossen, können aber auf andere Personen übertragen werden.</p>
-      </details>
-      <details>
-        <summary>Gibt es Parkplätze?</summary>
-        <p>Ja, wir haben über 2000 kostenlose Parkplätze direkt am Eingang!</p>
-      </details>
-      <details>
-        <summary>Darf ich Essen mitbringen?</summary>
-        <p>Ja, du darfst eigene Snacks mitbringen – bitte achte nur auf Mülltrennung und Sauberkeit.</p>
-      </details>
-    </section>
+  <!-- 📬 KONTAKT -->
+  <section id="contact">
+    <h2>📬 Kontakt & Support</h2>
+    <form id="contactForm">
+      <label for="contactName">Dein Name:</label>
+      <input type="text" id="contactName" required>
 
-    <!-- 📬 KONTAKT -->
-    <section id="contact">
-      <h2>📬 Kontakt & Support</h2>
-      <form id="contactForm">
-        <label>Dein Name:</label>
-        <input type="text" required>
+      <label for="contactEmail">E-Mail:</label>
+      <input type="email" id="contactEmail" required>
 
-        <label>E-Mail:</label>
-        <input type="email" required>
+      <label for="contactMessageInput">Nachricht:</label>
+      <textarea id="contactMessageInput" rows="5" required></textarea>
 
-        <label>Nachricht:</label>
-        <textarea rows="5" required></textarea>
+      <button type="submit">Nachricht senden 📧</button>
+    </form>
+    <div id="contactMessage" class="message" role="status"></div>
+  </section>
+</main>
 
-        <button type="submit">Nachricht senden 📧</button>
-      </form>
-      <div id="contactMessage" class="message"></div>
-    </section>
-  </main>
+<!-- ================= FOOTER ================= -->
+<footer>
+  <p>© 2025 FunPark – Freizeitpark Ticketsystem (Demo)</p>
+  <p><small>Diese Seite ist rein statisch und dient nur zu Demonstrationszwecken.</small></p>
+</footer>
 
-  <!-- ================= FOOTER ================= -->
-  <footer>
-    <p>© 2025 FunPark – Freizeitpark Ticketsystem (Demo)</p>
-    <p><small>Diese Seite ist rein statisch und dient nur zu Demonstrationszwecken.</small></p>
-  </footer>
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
