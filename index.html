@@ -3,22 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FunPark Ticketsystem</title>
+  <title>🎢 FunPark – Das ultimative Abenteuer!</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
+
 <body>
+<!-- Zahlungsmodal -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>💳 Zahlung über PayFun (Demo)</h2>
+    <div id="paymentInfo"></div>
+
+    <!-- Zahlungsformular (Demo, vorausgefüllt & gesperrt) -->
+    <form id="paymentForm">
+      <label>Name auf Karte:</label>
+      <input type="text" value="Max Mustermann" readonly>
+
+      <label>Kartennummer:</label>
+      <input type="text" value="1234 5678 9012 3456" readonly>
+
+      <label>Gültig bis:</label>
+      <input type="text" value="12/25" readonly>
+
+      <label>CVC:</label>
+      <input type="text" value="123" readonly>
+
+      <button type="submit">Zahlung durchführen ✅</button>
+    </form>
+
+    <div id="paymentResult"></div>
+  </div>
+</div>
+
+
+  <!-- ================= HEADER ================= -->
   <header>
-    <h1>🎢 FunPark – Dein Abenteuer wartet!</h1>
+    <div class="logo-area">
+      <h1>🎢 FunPark</h1>
+      <p>Das ultimative Abenteuer für Groß & Klein!</p>
+    </div>
     <nav>
-      <button onclick="showSection('buy')">🎟️ Ticket kaufen</button>
+      <button onclick="showSection('home')">🏠 Start</button>
+      <button onclick="showSection('buy')">🎟️ Tickets</button>
       <button onclick="showSection('view')">💳 Ticket anzeigen</button>
       <button onclick="showSection('redeem')">✅ Ticket einlösen</button>
+      <button onclick="showSection('gallery')">📸 Galerie</button>
+      <button onclick="showSection('faq')">❓ FAQ</button>
+      <button onclick="showSection('contact')">📬 Kontakt</button>
     </nav>
   </header>
 
+  <!-- ================= MAIN ================= -->
   <main>
-    <!-- Ticket kaufen -->
-    <section id="buy" class="visible">
+    <!-- 🏠 HOME -->
+    <section id="home" class="visible">
+      <div class="hero">
+        <h2>Willkommen im FunPark!</h2>
+        <p>Erlebe Nervenkitzel, Spaß und Abenteuer – an nur einem Ort. Egal ob Achterbahnen, Shows oder Wasserspaß – bei uns ist für alle etwas dabei!</p>
+        <button onclick="showSection('buy')" class="cta">Jetzt Ticket sichern 🎟️</button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>🎢 Attraktionen</h3>
+          <p>Über 40 Fahrgeschäfte, darunter unsere legendäre Holzachterbahn „ThunderRide“ und das 4D-Erlebnis „Galaxy Flight“!</p>
+        </div>
+        <div class="info-card">
+          <h3>🍔 Gastronomie</h3>
+          <p>Von Burgern bis Veggie Bowls – entdecke über 20 Restaurants & Snackbars im gesamten Park.</p>
+        </div>
+        <div class="info-card">
+          <h3>👨‍👩‍👧‍👦 Familienfreundlich</h3>
+          <p>Kinderbereiche, Familien-Tickets und Wickelstationen – der Spaß für die ganze Familie!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🎟️ TICKET KAUFEN -->
+    <section id="buy">
       <h2>🎟️ Ticket kaufen</h2>
       <form id="buyForm">
         <label>Benutzername:</label>
@@ -29,14 +96,22 @@
           <option value="Tagesticket">Tagesticket – 35€</option>
           <option value="2-Tage-Ticket">2-Tage-Ticket – 60€</option>
           <option value="Familien-Ticket">Familien-Ticket – 90€</option>
+          <option value="VIP-Ticket">VIP-Ticket – 150€ (mit Fast Lane)</option>
         </select>
 
-        <button type="submit">Kaufen</button>
+        <label>Zahlungsmethode:</label>
+        <select>
+          <option>Kreditkarte</option>
+          <option>PayPal</option>
+          <option>EC-Karte</option>
+        </select>
+
+        <button type="submit">Ticket kaufen 💳</button>
       </form>
       <div id="buyMessage" class="message"></div>
     </section>
 
-    <!-- Ticket anzeigen -->
+    <!-- 💳 TICKET ANZEIGEN -->
     <section id="view">
       <h2>💳 Ticket anzeigen</h2>
       <form id="viewForm">
@@ -47,7 +122,7 @@
       <div id="ticketList"></div>
     </section>
 
-    <!-- Ticket einlösen -->
+    <!-- ✅ TICKET EINLÖSEN -->
     <section id="redeem">
       <h2>✅ Ticket einlösen</h2>
       <form id="redeemForm">
@@ -57,10 +132,60 @@
       </form>
       <div id="redeemMessage" class="message"></div>
     </section>
+
+    <!-- 📸 GALERIE -->
+    <section id="gallery">
+      <h2>📸 Eindrücke aus dem FunPark</h2>
+      <div class="gallery-grid">
+        <img src="https://source.unsplash.com/400x250/?rollercoaster" alt="Achterbahn">
+        <img src="https://source.unsplash.com/400x250/?themepark" alt="Freizeitpark">
+        <img src="https://source.unsplash.com/400x250/?ferriswheel" alt="Riesenrad">
+        <img src="https://source.unsplash.com/400x250/?waterpark" alt="Wasserrutsche">
+        <img src="https://source.unsplash.com/400x250/?children,fun" alt="Familienbereich">
+        <img src="https://source.unsplash.com/400x250/?fireworks,night" alt="Abendshow">
+      </div>
+    </section>
+
+    <!-- ❓ FAQ -->
+    <section id="faq">
+      <h2>❓ Häufige Fragen</h2>
+      <details>
+        <summary>Kann ich Tickets stornieren?</summary>
+        <p>Nein, bereits gekaufte Tickets sind vom Umtausch ausgeschlossen, können aber auf andere Personen übertragen werden.</p>
+      </details>
+      <details>
+        <summary>Gibt es Parkplätze?</summary>
+        <p>Ja, wir haben über 2000 kostenlose Parkplätze direkt am Eingang!</p>
+      </details>
+      <details>
+        <summary>Darf ich Essen mitbringen?</summary>
+        <p>Ja, du darfst eigene Snacks mitbringen – bitte achte nur auf Mülltrennung und Sauberkeit.</p>
+      </details>
+    </section>
+
+    <!-- 📬 KONTAKT -->
+    <section id="contact">
+      <h2>📬 Kontakt & Support</h2>
+      <form id="contactForm">
+        <label>Dein Name:</label>
+        <input type="text" required>
+
+        <label>E-Mail:</label>
+        <input type="email" required>
+
+        <label>Nachricht:</label>
+        <textarea rows="5" required></textarea>
+
+        <button type="submit">Nachricht senden 📧</button>
+      </form>
+      <div id="contactMessage" class="message"></div>
+    </section>
   </main>
 
+  <!-- ================= FOOTER ================= -->
   <footer>
-    <p>© 2025 FunPark – Ticketsystem Demo</p>
+    <p>© 2025 FunPark – Freizeitpark Ticketsystem (Demo)</p>
+    <p><small>Diese Seite ist rein statisch und dient nur zu Demonstrationszwecken.</small></p>
   </footer>
 
   <script src="script.js"></script>
