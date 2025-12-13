@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎢 FunPark – Ticketsystem</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Montserrat",sans-serif}
+body{background:linear-gradient(135deg,#e3f2fd,#fff);min-height:100vh}
+header{background:#1976d2;color:#fff;padding:1rem;text-align:center;box-shadow:0 3px 6px rgba(0,0,0,.2)}
+nav{margin-top:.8rem;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem}
+nav button{background:#fff;border:none;color:#1976d2;padding:.6rem 1rem;font-weight:600;border-radius:8px;cursor:pointer}
+main{max-width:1000px;margin:2rem auto;background:#fff;border-radius:16px;padding:2rem;box-shadow:0 4px 15px rgba(0,0,0,.15)}
+section{display:none}
+section.visible{display:block}
+h2{color:#1976d2;margin-bottom:1rem}
+form{display:flex;flex-direction:column;gap:1rem}
+input,select,button{padding:.7rem;border-radius:6px;border:1px solid #ccc}
+button{background:#1976d2;color:#fff;font-weight:600;cursor:pointer}
+button:hover{background:#1565c0}
+.message{margin-top:1rem;font-weight:600}
+.ticket{background:#f5f5f5;border-radius:10px;padding:1rem;margin-top:1rem}
+footer{text-align:center;padding:1.5rem;background:#1976d2;color:#fff;margin-top:2rem}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎢 FunPark</h1>
+  <p>Professionelles Ticketsystem (Demo)</p>
+  <nav>
+    <button onclick="showSection('home')">Start</button>
+    <button onclick="showSection('buy')">Tickets</button>
+    <button onclick="showSection('view')">Meine Tickets</button>
+  </nav>
+</header>
+
+<main>
+
+<section id="home" class="visible">
+  <h2>Willkommen 👋</h2>
+  <p>Buche Tickets, bezahle sicher und verwalte deine Bestellungen.</p>
+</section>
+
+<section id="buy">
+<h2>🎟️ Ticket kaufen</h2>
+<form id="buyForm">
+  <label>Benutzer</label>
+  <select id="userSelect"></select>
+
+  <label>Ticket</label>
+  <select id="ticketType">
+    <option value="Tagesticket|35">Tagesticket – 35€</option>
+    <option value="2-Tage-Ticket|60">2-Tage – 60€</option>
+    <option value="Familien-Ticket|90">Familie – 90€</option>
+    <option value="VIP-Ticket|150">VIP – 150€</option>
+  </select>
+
+  <button type="submit">Weiter zur Zahlung 🔐</button>
+</form>
+<div id="buyMessage" class="message"></div>
+</section>
+
+<section id="view">
+<h2>💳 Meine Tickets</h2>
+<form id="viewForm">
+  <select id="userSelectView"></select>
+  <button>Anzeigen</button>
+</form>
+<div id="ticketList"></div>
+</section>
+
+</main>
+
+<footer>
+<p>© 2025 FunPark – Demo</p>
+</footer>
+
+<script>
+/* ================= BASIS ================= */
+const users=["Max","Anna","Tom","Lea"];
+let tickets=JSON.parse(localStorage.getItem("tickets"))||[];
+
+/* ================= NAV ================= */
+function showSection(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("visible"));
+  document.getElementById(id).classList.add("visible");
+}
+
+/* ================= USERS ================= */
+function fillUsers(){
+  ["userSelect","userSelectView"].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML="";
+    users.forEach(u=>{
+      const o=document.createElement("option");
+      o.textContent=u; o.value=u;
+      sel.appendChild(o);
+    });
+  });
+}
+fillUsers();
+
+/* ================= KAUF ================= */
+document.getElementById("buyForm").addEventListener("submit",e=>{
+  e.preventDefault();
+
+  const user=userSelect.value;
+  const [type,price]=ticketType.value.split("|");
+
+  const paymentData={user,type,price};
+  localStorage.setItem("pendingPayment",JSON.stringify(paymentData));
+
+  openPaymentPage();
+});
+
+/* ================= PAYMENT TAB ================= */
+function openPaymentPage(){
+  const w=window.open("","_blank");
+  w.document.write(`
+<!DOCTYPE html><html><head><title>Zahlung</title>
+<style>
+body{font-family:Montserrat,sans-serif;background:#f5f7fa;padding:2rem}
+.box{max-width:400px;margin:auto;background:#fff;padding:2rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+h2{color:#1976d2}
+.sec{margin:1rem 0;font-size:.9rem;color:#555}
+button{width:100%;padding:.8rem;background:#1976d2;color:#fff;border:none;border-radius:6px;font-size:1rem}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🔒 Sichere Zahlung</h2>
+<div id="info"></div>
+<div class="sec">✔ SSL-verschlüsselt<br>✔ Keine echten Daten</div>
+<button onclick="pay()">Jetzt bezahlen</button>
+</div>
+
+<script>
+const data=JSON.parse(localStorage.getItem("pendingPayment"));
+document.getElementById("info").innerHTML=
+\`<p><strong>\${data.type}</strong></p><p>Betrag: <b>\${data.price} €</b></p>\`;
+
+function pay(){
+  const code="TCK-"+Math.floor(100000+Math.random()*900000);
+  const tickets=JSON.parse(localStorage.getItem("tickets"))||[];
+  tickets.push({...data,code,redeemed:false});
+  localStorage.setItem("tickets",JSON.stringify(tickets));
+  localStorage.removeItem("pendingPayment");
+  alert("Zahlung erfolgreich! Ticket: "+code);
+  window.close();
+}
+<\/script>
+</body></html>`);
+}
+
+/* ================= ANZEIGE ================= */
+document.getElementById("viewForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const u=userSelectView.value;
+  ticketList.innerHTML="";
+  tickets.filter(t=>t.user===u).forEach(t=>{
+    ticketList.innerHTML+=`
+      <div class="ticket">
+        <b>${t.code}</b><br>
+        ${t.type} – ${t.price} €
+      </div>`;
+  });
+});
+</script>
+
+</body>
+</html>
