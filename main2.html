@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎢 FunPark – Ultimate Static Ticket Experience</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+/* ================= THEME ================= */
+:root{
+ --bg:#f4f6f9;
+ --card:#ffffff;
+ --primary:#1976d2;
+ --accent:#ff9800;
+ --text:#1f1f1f;
+ --muted:#666;
+}
+body.dark{
+ --bg:#0f1115;
+ --card:#1c1f26;
+ --primary:#90caf9;
+ --accent:#ffb74d;
+ --text:#eee;
+ --muted:#aaa;
+}
+
+/* ================= BASE ================= */
+*{box-sizing:border-box;margin:0;padding:0;font-family:Montserrat,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;transition:.3s}
+a{color:var(--primary);text-decoration:none}
+button{cursor:pointer}
+
+/* ================= HEADER ================= */
+header{
+ background:linear-gradient(135deg,var(--primary),#0d47a1);
+ color:#fff;
+ padding:1.2rem;
+ text-align:center;
+ box-shadow:0 4px 15px rgba(0,0,0,.25);
+}
+header h1{font-size:2rem}
+header p{opacity:.85}
+
+/* ================= NAV ================= */
+nav{
+ margin-top:1rem;
+ display:flex;
+ justify-content:center;
+ gap:.6rem;
+ flex-wrap:wrap;
+}
+nav button{
+ background:#fff;
+ border:none;
+ color:#0d47a1;
+ padding:.55rem 1rem;
+ border-radius:999px;
+ font-weight:600;
+}
+
+/* ================= MAIN ================= */
+main{
+ max-width:1200px;
+ margin:2rem auto;
+ padding:2rem;
+ background:var(--card);
+ border-radius:20px;
+ box-shadow:0 10px 40px rgba(0,0,0,.2);
+ animation:fade .4s ease;
+}
+section{display:none}
+section.active{display:block}
+
+/* ================= COMPONENTS ================= */
+h2{color:var(--primary);margin-bottom:1rem}
+.card{
+ background:var(--bg);
+ padding:1.5rem;
+ border-radius:16px;
+ margin-top:1rem;
+ box-shadow:0 4px 15px rgba(0,0,0,.15);
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+ gap:1.5rem;
+}
+
+/* ================= FORMS ================= */
+form{display:flex;flex-direction:column;gap:1rem}
+input,select,textarea{
+ padding:.8rem;
+ border-radius:10px;
+ border:1px solid #ccc;
+ background:var(--card);
+ color:var(--text);
+}
+button.primary{
+ background:var(--primary);
+ color:#fff;
+ border:none;
+ padding:.9rem;
+ border-radius:12px;
+ font-weight:700;
+}
+button.secondary{
+ background:transparent;
+ border:2px solid var(--primary);
+ color:var(--primary);
+ padding:.7rem;
+ border-radius:12px;
+}
+
+/* ================= TICKET ================= */
+.ticket{
+ position:relative;
+}
+.ticket .code{
+ font-size:1.1rem;
+ font-weight:700;
+ letter-spacing:1px;
+}
+.badge{
+ position:absolute;
+ top:1rem;
+ right:1rem;
+ background:var(--accent);
+ color:#000;
+ padding:.3rem .6rem;
+ border-radius:999px;
+ font-size:.75rem;
+ font-weight:700;
+}
+
+/* ================= TOAST ================= */
+.toast{
+ position:fixed;
+ bottom:20px;
+ left:50%;
+ transform:translateX(-50%);
+ background:var(--primary);
+ color:#fff;
+ padding:.8rem 1.2rem;
+ border-radius:999px;
+ box-shadow:0 4px 15px rgba(0,0,0,.3);
+ opacity:0;
+ pointer-events:none;
+ transition:.3s;
+}
+.toast.show{opacity:1}
+
+/* ================= FOOTER ================= */
+footer{
+ text-align:center;
+ padding:1.5rem;
+ color:#fff;
+ background:linear-gradient(135deg,#0d47a1,var(--primary));
+}
+
+/* ================= ANIM ================= */
+@keyframes fade{
+ from{opacity:0;transform:translateY(10px)}
+ to{opacity:1;transform:none}
+}
+
+/* ================= FLOAT ================= */
+.fab{
+ position:fixed;
+ right:20px;
+ bottom:20px;
+ width:50px;
+ height:50px;
+ border-radius:50%;
+ border:none;
+ background:var(--accent);
+ font-size:1.4rem;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🎢 FunPark</h1>
+<p>Die ultimative statische Ticket-Web-App</p>
+<nav>
+<button onclick="go('home')">Start</button>
+<button onclick="go('buy')">Tickets</button>
+<button onclick="go('my')">Meine Tickets</button>
+<button onclick="go('faq')">FAQ</button>
+</nav>
+</header>
+
+<main>
+
+<section id="home" class="active">
+<h2>Willkommen</h2>
+<div class="grid">
+<div class="card">🎢 40+ Attraktionen</div>
+<div class="card">💳 Sichere Zahlung (Demo)</div>
+<div class="card">📱 QR- & PDF-Tickets</div>
+</div>
+</section>
+
+<section id="buy">
+<h2>🎟️ Ticket kaufen</h2>
+<form id="buyForm">
+<select id="user">
+<option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
+</select>
+
+<select id="ticket">
+<option value="Tagesticket|35">Tagesticket – 35€</option>
+<option value="2-Tage-Ticket|60">2 Tage – 60€</option>
+<option value="Familien-Ticket|90">Familie – 90€</option>
+<option value="VIP-Ticket|150">VIP – 150€</option>
+</select>
+
+<button class="primary">Zur Zahlung 🔐</button>
+</form>
+</section>
+
+<section id="my">
+<h2>💳 Meine Tickets</h2>
+<select id="viewUser">
+<option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
+</select>
+<button class="secondary" onclick="loadTickets()">Anzeigen</button>
+<div id="ticketList"></div>
+</section>
+
+<section id="faq">
+<h2>❓ FAQ</h2>
+<div class="card">Tickets sind übertragbar.</div>
+<div class="card">Zahlung ist Demo.</div>
+<div class="card">Alles läuft lokal im Browser.</div>
+</section>
+
+</main>
+
+<footer>© 2025 FunPark – 100 % statisch • 0 % Backend</footer>
+
+<button class="fab" onclick="toggleDark()">🌙</button>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+let tickets=JSON.parse(localStorage.getItem("tickets"))||[];
+
+/* ================= NAV ================= */
+function go(id){
+ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+}
+
+/* ================= TOAST ================= */
+function toast(msg){
+ const t=document.getElementById("toast");
+ t.textContent=msg;
+ t.classList.add("show");
+ setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+/* ================= BUY ================= */
+buyForm.onsubmit=e=>{
+ e.preventDefault();
+ const [type,price]=ticket.value.split("|");
+ localStorage.setItem("pending",JSON.stringify({user:user.value,type,price}));
+ openPayment();
+};
+
+/* ================= PAYMENT ================= */
+function openPayment(){
+ const w=window.open("","_blank");
+ w.document.write(`
+ <h2>🔒 Zahlung</h2>
+ <p id="info"></p>
+ <progress max="100" value="0" id="p"></progress><br><br>
+ <button onclick="pay()">Bezahlen</button>
+ <script>
+ const d=JSON.parse(localStorage.getItem("pending"));
+ info.innerHTML=d.type+" – <b>"+d.price+"€</b>";
+ let v=0;const i=setInterval(()=>{p.value=v+=20;if(v>=100)clearInterval(i)},300);
+ function pay(){
+  const code="TCK-"+crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+  const t=JSON.parse(localStorage.getItem("tickets"))||[];
+  t.push({...d,code,redeemed:false});
+  localStorage.setItem("tickets",JSON.stringify(t));
+  alert("Zahlung erfolgreich");
+  window.close();
+ }
+ <\/script>
+ `);
+}
+
+/* ================= TICKETS ================= */
+function loadTickets(){
+ ticketList.innerHTML="";
+ tickets=JSON.parse(localStorage.getItem("tickets"))||[];
+ tickets.filter(t=>t.user===viewUser.value).forEach(t=>{
+  const div=document.createElement("div");
+  div.className="card ticket";
+  div.innerHTML=`
+   <div class="badge">${t.redeemed?"Eingelöst":"Gültig"}</div>
+   <div class="code">${t.code}</div>
+   ${t.type} – ${t.price}€<br>
+   <div id="qr${t.code}"></div>
+   <button onclick="download('${t.code}','${t.type}','${t.price}')">PDF</button>
+  `;
+  ticketList.appendChild(div);
+  new QRCode(document.getElementById("qr"+t.code),t.code);
+ });
+}
+
+/* ================= PDF ================= */
+function download(code,type,price){
+ const {jsPDF}=window.jspdf;
+ const pdf=new jsPDF();
+ pdf.text("FunPark Ticket",20,20);
+ pdf.text("Code: "+code,20,30);
+ pdf.text(type+" – "+price+"€",20,40);
+ pdf.save(code+".pdf");
+}
+
+/* ================= DARK ================= */
+function toggleDark(){
+ document.body.classList.toggle("dark");
+ localStorage.setItem("dark",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true")document.body.classList.add("dark");
+</script>
+
+</body>
+</html>
