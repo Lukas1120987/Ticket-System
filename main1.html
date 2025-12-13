@@ -3,250 +3,454 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎢 FunPark – Ultimate Static System</title>
 
+<title>🎢 FunPark – Statisches Ticketsystem (Abiturprojekt)</title>
+
+<!-- ================= FONTS & LIBRARIES ================= -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
+<!-- ================= STYLES ================= -->
 <style>
+
+/* ======================================================
+   THEME VARIABLES (Light / Dark Mode)
+   ====================================================== */
 :root{
- --bg:#f4f6f9;--card:#fff;--primary:#1976d2;--accent:#ff9800;
- --text:#222;--good:#4caf50;--bad:#f44336;
+  --bg:#f4f6fa;
+  --card:#ffffff;
+  --primary:#1976d2;
+  --accent:#ff9800;
+  --text:#1f1f1f;
+  --muted:#666;
+  --success:#4caf50;
+  --error:#f44336;
 }
+
 body.dark{
- --bg:#0f1115;--card:#1e222b;--text:#eee;
+  --bg:#0f1115;
+  --card:#1c1f26;
+  --primary:#90caf9;
+  --accent:#ffb74d;
+  --text:#eaeaea;
+  --muted:#aaa;
 }
 
-*{box-sizing:border-box;font-family:Montserrat;margin:0}
-body{background:var(--bg);color:var(--text);transition:.3s}
+/* ======================================================
+   GLOBAL BASE
+   ====================================================== */
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:"Montserrat",sans-serif;
+}
 
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
+
+button{cursor:pointer}
+
+/* ======================================================
+   HEADER & NAVIGATION
+   ====================================================== */
 header{
- background:linear-gradient(135deg,var(--primary),#0d47a1);
- color:#fff;padding:1.2rem;text-align:center
+  background:linear-gradient(135deg,var(--primary),#0d47a1);
+  color:#fff;
+  padding:1.4rem;
+  text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
 }
 
-nav{margin-top:1rem;display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap}
+nav{
+  margin-top:1rem;
+  display:flex;
+  justify-content:center;
+  gap:.6rem;
+  flex-wrap:wrap;
+}
+
 nav button{
- border:none;border-radius:999px;padding:.6rem 1rem;font-weight:600
+  border:none;
+  padding:.6rem 1.1rem;
+  border-radius:999px;
+  font-weight:600;
 }
 
+/* ======================================================
+   MAIN LAYOUT
+   ====================================================== */
 main{
- max-width:1200px;margin:2rem auto;background:var(--card);
- padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)
+  max-width:1200px;
+  margin:2rem auto;
+  padding:2rem;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:0 10px 40px rgba(0,0,0,.25);
+  animation:fade .4s ease;
 }
 
 section{display:none}
 section.active{display:block}
 
-h2{color:var(--primary);margin-bottom:1rem}
-
-.card{
- background:var(--bg);padding:1.5rem;border-radius:16px;
- box-shadow:0 4px 15px rgba(0,0,0,.15);margin-top:1rem
+/* ======================================================
+   COMPONENTS
+   ====================================================== */
+h2{
+  color:var(--primary);
+  margin-bottom:1rem;
 }
 
-form{display:flex;flex-direction:column;gap:1rem}
-input,select{
- padding:.8rem;border-radius:10px;border:1px solid #ccc
+.card{
+  background:var(--bg);
+  padding:1.5rem;
+  border-radius:16px;
+  box-shadow:0 4px 15px rgba(0,0,0,.15);
+  margin-top:1rem;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;
+}
+
+/* ======================================================
+   FORMS
+   ====================================================== */
+form{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+
+input,select,textarea{
+  padding:.8rem;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:1rem;
 }
 
 button.primary{
- background:var(--primary);color:#fff;border:none;
- padding:.9rem;border-radius:12px;font-weight:700
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  padding:.9rem;
+  border-radius:12px;
+  font-weight:700;
 }
+
 button.secondary{
- background:transparent;border:2px solid var(--primary);
- color:var(--primary);padding:.7rem;border-radius:12px
+  background:transparent;
+  border:2px solid var(--primary);
+  color:var(--primary);
+  padding:.7rem;
+  border-radius:12px;
 }
 
+/* ======================================================
+   TICKET CARD
+   ====================================================== */
 .ticket{
- position:relative;margin-top:1rem
+  position:relative;
 }
+
 .badge{
- position:absolute;top:1rem;right:1rem;
- padding:.3rem .7rem;border-radius:999px;
- font-size:.75rem;font-weight:700
+  position:absolute;
+  top:1rem;
+  right:1rem;
+  padding:.35rem .7rem;
+  border-radius:999px;
+  font-size:.75rem;
+  font-weight:700;
 }
 
-.good{background:var(--good);color:#fff}
-.bad{background:var(--bad);color:#fff}
+.valid{background:var(--success);color:#fff}
+.used{background:var(--error);color:#fff}
 
-#scanner{
- background:#000;color:#0f0;font-family:monospace;
- padding:1rem;border-radius:12px
+/* ======================================================
+   SCANNER GATE
+   ====================================================== */
+#gate{
+  height:200px;
+  border-radius:16px;
+  border:5px solid #ccc;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+  font-weight:700;
+  margin-bottom:1rem;
+  transition:.4s;
 }
 
-.toast{
- position:fixed;bottom:20px;left:50%;
- transform:translateX(-50%);
- background:var(--primary);color:#fff;
- padding:.8rem 1.2rem;border-radius:999px;
- opacity:0;transition:.3s
-}
-.toast.show{opacity:1}
+.gate-ok{border-color:var(--success);color:var(--success)}
+.gate-bad{border-color:var(--error);color:var(--error)}
 
+/* ======================================================
+   FLOATING BUTTON
+   ====================================================== */
 .fab{
- position:fixed;right:20px;bottom:20px;
- width:50px;height:50px;border-radius:50%;
- border:none;background:var(--accent);font-size:1.4rem
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  font-size:1.4rem;
 }
+
+/* ======================================================
+   ANIMATION
+   ====================================================== */
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- ================= HEADER ================= -->
 <header>
-<h1>🎢 FunPark</h1>
-<p>Vollständiges statisches Ticketsystem</p>
-<nav>
-<button onclick="go('home')">Start</button>
-<button onclick="go('buy')">Tickets</button>
-<button onclick="go('my')">Meine Tickets</button>
-<button onclick="go('scan')">Scanner-Login</button>
-</nav>
+  <h1>🎢 FunPark</h1>
+  <p>Statisches Ticketsystem – Informatik Abiturprojekt</p>
+  <nav>
+    <button onclick="go('home')">Start</button>
+    <button onclick="go('buy')">Tickets kaufen</button>
+    <button onclick="go('my')">Meine Tickets</button>
+    <button onclick="go('scan')">Scanner-Login</button>
+  </nav>
 </header>
 
+<!-- ================= MAIN ================= -->
 <main>
 
 <section id="home" class="active">
-<h2>Willkommen</h2>
-<div class="card">🎟️ Kaufen • 💳 Bezahlen • 📱 Scannen • ❌ Entwerten</div>
+  <h2>Willkommen</h2>
+  <div class="grid">
+    <div class="card">🎟️ Ticketverwaltung</div>
+    <div class="card">💳 Realistische Zahlung (Demo)</div>
+    <div class="card">📱 QR-Scanner & Entwertung</div>
+  </div>
 </section>
 
 <section id="buy">
-<h2>🎟️ Ticket kaufen</h2>
-<form id="buyForm">
-<select id="user">
-<option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
-</select>
-<select id="ticket">
-<option value="Tagesticket|35">Tagesticket – 35€</option>
-<option value="VIP|150">VIP – 150€</option>
-</select>
-<button class="primary">Zur Zahlung 🔐</button>
-</form>
+  <h2>🎟️ Ticket kaufen</h2>
+  <form id="buyForm">
+    <select id="user">
+      <option>Max</option>
+      <option>Anna</option>
+      <option>Tom</option>
+      <option>Lea</option>
+    </select>
+
+    <select id="ticketType">
+      <option value="Tagesticket|35">Tagesticket – 35 €</option>
+      <option value="2-Tage-Ticket|60">2 Tage – 60 €</option>
+      <option value="VIP-Ticket|150">VIP – 150 €</option>
+    </select>
+
+    <button class="primary">Zur Zahlung 🔐</button>
+  </form>
 </section>
 
 <section id="my">
-<h2>💳 Meine Tickets</h2>
-<select id="viewUser">
-<option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
-</select>
-<button class="secondary" onclick="loadTickets()">Anzeigen</button>
-<div id="ticketList"></div>
+  <h2>💳 Meine Tickets</h2>
+  <select id="viewUser">
+    <option>Max</option>
+    <option>Anna</option>
+    <option>Tom</option>
+    <option>Lea</option>
+  </select>
+  <button class="secondary" onclick="loadTickets()">Anzeigen</button>
+  <div id="ticketList"></div>
 </section>
 
 <section id="scan">
-<h2>🔐 Scanner-Login</h2>
+  <h2>🔐 Scanner-Login (Einlass)</h2>
 
-<div class="card">
-<input id="scanInput" placeholder="Ticketcode eingeben">
-<button class="primary" onclick="scanCode()">Ticket prüfen</button>
-</div>
+  <div id="gate">🟡 Bereit</div>
 
-<div class="card">
-<div id="reader" style="width:100%"></div>
-</div>
+  <div class="card">
+    <input id="manualCode" placeholder="Ticketcode manuell eingeben">
+    <button class="primary" onclick="validateTicket()">Prüfen</button>
+  </div>
 
-<div id="scanner"></div>
+  <div class="card">
+    <div id="reader"></div>
+  </div>
 </section>
 
 </main>
 
 <button class="fab" onclick="toggleDark()">🌙</button>
-<div class="toast" id="toast"></div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+
+/* ======================================================
+   STATE MANAGEMENT
+   ====================================================== */
+let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+
+/* ======================================================
+   NAVIGATION
+   ====================================================== */
+function go(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* ======================================================
+   DARK MODE
+   ====================================================== */
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true"){
+  document.body.classList.add("dark");
+}
+
+/* ======================================================
+   BUY & PAYMENT
+   ====================================================== */
+document.getElementById("buyForm").addEventListener("submit",e=>{
+  e.preventDefault();
+
+  const [type,price] = ticketType.value.split("|");
+  const paymentData = {
+    user:user.value,
+    type,
+    price
+  };
+
+  localStorage.setItem("pendingPayment",JSON.stringify(paymentData));
+  openPaymentPage();
+});
+
+/* ---- Payment Page (New Tab) ---- */
+function openPaymentPage(){
+  const w = window.open("","_blank");
+  w.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>PayFun Secure</title>
+<style>
+body{font-family:Montserrat;background:#f4f6fa;padding:2rem}
+.box{max-width:420px;margin:auto;background:#fff;padding:2rem;border-radius:14px}
+progress{width:100%}
+button{width:100%;padding:.8rem;margin-top:1rem}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🔒 PayFun Secure</h2>
+<p id="info"></p>
+<progress id="p" max="100" value="0"></progress>
+<button onclick="pay()">Jetzt bezahlen</button>
+</div>
 
 <script>
-let tickets=JSON.parse(localStorage.getItem("tickets"))||[];
+const d=JSON.parse(localStorage.getItem("pendingPayment"));
+info.innerHTML=d.type+" – <b>"+d.price+" €</b>";
+let v=0;
+const i=setInterval(()=>{p.value=v+=10;if(v>=100)clearInterval(i)},200);
 
-function go(id){
- document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
- document.getElementById(id).classList.add("active");
-}
-
-/* ===== TOAST ===== */
-function toast(msg){
- const t=document.getElementById("toast");
- t.textContent=msg;t.classList.add("show");
- setTimeout(()=>t.classList.remove("show"),2500);
-}
-
-/* ===== BUY & PAYMENT ===== */
-buyForm.onsubmit=e=>{
- e.preventDefault();
- const [type,price]=ticket.value.split("|");
- localStorage.setItem("pending",JSON.stringify({user:user.value,type,price}));
- openPayment();
-};
-
-function openPayment(){
- const w=window.open("","_blank");
- w.document.write(`
- <h2>🔒 PayFun Secure</h2>
- <p id="info"></p>
- <progress max="100" value="0" id="p"></progress><br><br>
- <button onclick="pay()">Jetzt bezahlen</button>
- <script>
- const d=JSON.parse(localStorage.getItem("pending"));
- info.innerHTML=d.type+" – <b>"+d.price+"€</b>";
- let v=0;const i=setInterval(()=>{p.value=v+=20;if(v>=100)clearInterval(i)},250);
- function pay(){
+function pay(){
   const code="TCK-"+crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
   const t=JSON.parse(localStorage.getItem("tickets"))||[];
   t.push({...d,code,redeemed:false});
   localStorage.setItem("tickets",JSON.stringify(t));
   alert("Zahlung erfolgreich");
   window.close();
- }
- <\/script>
- `);
+}
+<\/script>
+</body>
+</html>
+`);
 }
 
-/* ===== TICKETS ===== */
+/* ======================================================
+   TICKET DISPLAY
+   ====================================================== */
 function loadTickets(){
- ticketList.innerHTML="";
- tickets=JSON.parse(localStorage.getItem("tickets"))||[];
- tickets.filter(t=>t.user===viewUser.value).forEach(t=>{
-  const div=document.createElement("div");
-  div.className="card ticket";
-  div.innerHTML=`
-   <span class="badge ${t.redeemed?"bad":"good"}">
-    ${t.redeemed?"Entwertet":"Gültig"}
-   </span>
-   <b>${t.code}</b><br>${t.type} – ${t.price}€
-   <div id="qr${t.code}"></div>
-  `;
-  ticketList.appendChild(div);
-  new QRCode(document.getElementById("qr"+t.code),t.code);
- });
+  tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+  ticketList.innerHTML = "";
+
+  tickets.filter(t=>t.user===viewUser.value).forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "card ticket";
+    div.innerHTML = `
+      <span class="badge ${t.redeemed?"used":"valid"}">
+        ${t.redeemed?"ENTWERTET":"GÜLTIG"}
+      </span>
+      <strong>${t.code}</strong><br>
+      ${t.type} – ${t.price} €
+      <div id="qr${t.code}"></div>
+      <button onclick="downloadPDF('${t.code}','${t.type}','${t.price}')">PDF</button>
+    `;
+    ticketList.appendChild(div);
+    new QRCode(document.getElementById("qr"+t.code),t.code);
+  });
 }
 
-/* ===== SCANNER ===== */
-function scanCode(code){
- if(!code) code=scanInput.value.trim();
- const t=tickets.find(x=>x.code===code);
- const out=document.getElementById("scanner");
- if(!t){out.textContent="❌ Ticket ungültig";return;}
- if(t.redeemed){out.textContent="⚠️ Ticket bereits entwertet";return;}
- t.redeemed=true;
- localStorage.setItem("tickets",JSON.stringify(tickets));
- out.textContent="✅ Ticket akzeptiert & entwertet";
- toast("Zutritt erlaubt");
+/* ======================================================
+   PDF EXPORT
+   ====================================================== */
+function downloadPDF(code,type,price){
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF();
+  pdf.text("FunPark Ticket",20,20);
+  pdf.text("Ticketcode: "+code,20,30);
+  pdf.text(type+" – "+price+" €",20,40);
+  pdf.save(code+".pdf");
 }
 
-/* QR Kamera */
+/* ======================================================
+   SCANNER & VALIDATION
+   ====================================================== */
+function validateTicket(scanned){
+  const code = scanned || manualCode.value.trim();
+  const gate = document.getElementById("gate");
+
+  const t = tickets.find(x=>x.code===code);
+  if(!t){
+    gate.className="gate-bad";
+    gate.textContent="❌ Ungültig";
+    return;
+  }
+  if(t.redeemed){
+    gate.className="gate-bad";
+    gate.textContent="⚠️ Bereits genutzt";
+    return;
+  }
+
+  t.redeemed=true;
+  localStorage.setItem("tickets",JSON.stringify(tickets));
+  gate.className="gate-ok";
+  gate.textContent="✅ Zutritt erlaubt";
+}
+
+/* ---- Camera QR Scanner ---- */
 new Html5Qrcode("reader").start(
- {facingMode:"environment"},
- {fps:10,qrbox:250},
- txt=>scanCode(txt)
+  {facingMode:"environment"},
+  {fps:10,qrbox:250},
+  txt=>validateTicket(txt)
 );
 
-/* ===== DARK ===== */
-function toggleDark(){
- document.body.classList.toggle("dark");
-}
 </script>
 
 </body>
