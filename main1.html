@@ -340,272 +340,51 @@ document.getElementById("buyForm").addEventListener("submit",e=>{
   openPaymentPage();
 });
 
-/* ---- Payment Page (New Tab) ---- */
 function openPaymentPage(){
-  const w = window.open("","_blank");
+  const w = window.open("", "_blank");
+
+  w.document.open();
   w.document.write(`
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>PayFun Secure – Zahlung</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>PayFun Secure</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-/* =====================================================
-   GLOBAL
-   ===================================================== */
-*{box-sizing:border-box;font-family:Montserrat;margin:0}
-body{
-  background:#f3f5f9;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* =====================================================
-   PAYMENT CONTAINER
-   ===================================================== */
-.payment{
-  width:100%;
-  max-width:430px;
-  background:#fff;
-  border-radius:18px;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-  overflow:hidden;
-}
-
-/* =====================================================
-   HEADER
-   ===================================================== */
-.header{
-  background:linear-gradient(135deg,#1a73e8,#0d47a1);
-  color:#fff;
-  padding:1.5rem;
-}
-.header h1{
-  font-size:1.3rem;
-}
-.header p{
-  font-size:.9rem;
-  opacity:.9;
-}
-
-/* =====================================================
-   CONTENT
-   ===================================================== */
-.content{
-  padding:1.5rem;
-}
-
-.amount{
-  font-size:1.5rem;
-  font-weight:700;
-  margin-bottom:.5rem;
-}
-.muted{color:#666;font-size:.9rem}
-
-/* =====================================================
-   CARD PREVIEW
-   ===================================================== */
-.card-preview{
-  background:linear-gradient(135deg,#222,#444);
-  color:#fff;
-  border-radius:16px;
-  padding:1.2rem;
-  margin:1.2rem 0;
-}
-.card-number{
-  font-size:1.2rem;
-  letter-spacing:2px;
-}
-.card-row{
-  display:flex;
-  justify-content:space-between;
-  margin-top:1rem;
-  font-size:.85rem;
-}
-
-/* =====================================================
-   FORM
-   ===================================================== */
-form{
-  display:flex;
-  flex-direction:column;
-  gap:.8rem;
-}
-
-input{
-  padding:.75rem;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:1rem;
-}
-
-.row{
-  display:flex;
-  gap:.6rem;
-}
-
-/* =====================================================
-   BUTTONS
-   ===================================================== */
-button{
-  padding:.85rem;
-  border:none;
-  border-radius:12px;
-  font-weight:700;
-  font-size:1rem;
-}
-
-.pay{
-  background:#1a73e8;
-  color:#fff;
-  margin-top:.5rem;
-}
-
-.cancel{
-  background:transparent;
-  color:#666;
-}
-
-/* =====================================================
-   SECURITY
-   ===================================================== */
-.security{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:1rem;
-  font-size:.75rem;
-  color:#666;
-}
-
-/* =====================================================
-   LOADING / 3DS
-   ===================================================== */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.modal{
-  background:#fff;
-  padding:2rem;
-  border-radius:16px;
-  width:90%;
-  max-width:360px;
-  text-align:center;
-}
-progress{width:100%;margin-top:1rem}
+body{font-family:Montserrat;background:#f3f5f9;display:flex;justify-content:center;align-items:center;height:100vh}
+.box{background:#fff;padding:2rem;border-radius:16px;width:380px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+input,button{width:100%;padding:.7rem;margin-top:.6rem}
+button{background:#1976d2;color:#fff;border:none;border-radius:8px}
 </style>
 </head>
-
 <body>
 
-<div class="payment">
-
-  <!-- HEADER -->
-  <div class="header">
-    <h1>🔒 PayFun Secure</h1>
-    <p>Sichere Online-Zahlung</p>
-  </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-    <div class="amount" id="amount">– €</div>
-    <div class="muted" id="info">–</div>
-
-    <!-- CARD PREVIEW -->
-    <div class="card-preview">
-      <div class="card-number" id="previewNumber">•••• •••• •••• ••••</div>
-      <div class="card-row">
-        <span id="previewName">KARTENINHABER</span>
-        <span id="previewDate">MM/YY</span>
-      </div>
-    </div>
-
-    <!-- FORM -->
-    <form onsubmit="startPayment(event)">
-      <input placeholder="Karteninhaber" id="name" required>
-      <input placeholder="Kartennummer" id="number" maxlength="19" required>
-      <div class="row">
-        <input placeholder="MM/YY" id="date" required>
-        <input placeholder="CVC" id="cvc" maxlength="3" required>
-      </div>
-
-      <button class="pay">Jetzt bezahlen</button>
-      <button type="button" class="cancel" onclick="window.close()">Abbrechen</button>
-    </form>
-
-    <!-- SECURITY -->
-    <div class="security">
-      <span>🔐 SSL verschlüsselt</span>
-      <span>PCI-DSS ✔</span>
-    </div>
-  </div>
-</div>
-
-<!-- OVERLAY -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h3>3-D Secure</h3>
-    <p>Ihre Zahlung wird überprüft…</p>
-    <progress id="prog" max="100" value="0"></progress>
-  </div>
+<div class="box">
+<h2>🔒 PayFun Secure</h2>
+<p id="info"></p>
+<input id="card" placeholder="Kartennummer">
+<input id="name" placeholder="Name">
+<button onclick="pay()">Jetzt bezahlen</button>
 </div>
 
 <script>
-/* =====================================================
-   LOAD PAYMENT DATA
-   ===================================================== */
 const d = JSON.parse(localStorage.getItem("pendingPayment"));
-document.getElementById("amount").textContent = d.price + " €";
-document.getElementById("info").textContent = d.type;
+document.getElementById("info").innerHTML = d.type + " – <b>" + d.price + " €</b>";
 
-/* =====================================================
-   LIVE CARD PREVIEW
-   ===================================================== */
-number.oninput = e=>{
-  let v = e.target.value.replace(/\D/g,"").substring(0,16);
-  v = v.replace(/(.{4})/g,"$1 ").trim();
-  e.target.value = v;
-  previewNumber.textContent = v || "•••• •••• •••• ••••";
-};
-name.oninput = e=>previewName.textContent = e.target.value.toUpperCase() || "KARTENINHABER";
-date.oninput = e=>previewDate.textContent = e.target.value || "MM/YY";
-
-/* =====================================================
-   PAYMENT FLOW
-   ===================================================== */
-function startPayment(e){
-  e.preventDefault();
-  overlay.style.display="flex";
-
-  let v=0;
-  const i=setInterval(()=>{
-    prog.value = v+=20;
-    if(v>=100){
-      clearInterval(i);
-      finishPayment();
-    }
-  },300);
-}
-
-function finishPayment(){
-  const code = "TCK-"+crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+function pay(){
+  const code = "TCK-" + Math.floor(100000 + Math.random()*900000);
   const t = JSON.parse(localStorage.getItem("tickets")) || [];
-  t.push({...d,code,redeemed:false});
-  localStorage.setItem("tickets",JSON.stringify(t));
-  alert("✅ Zahlung erfolgreich");
+  t.push({...d, code, redeemed:false});
+  localStorage.setItem("tickets", JSON.stringify(t));
+  alert("Zahlung erfolgreich!");
   window.close();
+}
+<\/script>
+
+</body>
+</html>`);
+  w.document.close();
 }
 </script>
 
