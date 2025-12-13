@@ -3,99 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎢 FunPark – Ticketsystem</title>
+<title>🎢 FunPark – Ultimate Static System</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 :root{
-  --bg:#f5f7fa;
-  --card:#fff;
-  --primary:#1976d2;
-  --text:#222;
+ --bg:#f4f6f9;--card:#fff;--primary:#1976d2;--accent:#ff9800;
+ --text:#222;--good:#4caf50;--bad:#f44336;
 }
 body.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --primary:#90caf9;
-  --text:#eee;
+ --bg:#0f1115;--card:#1e222b;--text:#eee;
 }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:Montserrat,sans-serif}
-body{background:var(--bg);color:var(--text);min-height:100vh}
+*{box-sizing:border-box;font-family:Montserrat;margin:0}
+body{background:var(--bg);color:var(--text);transition:.3s}
 
 header{
-  background:var(--primary);
-  color:#fff;
-  padding:1rem;
-  text-align:center;
+ background:linear-gradient(135deg,var(--primary),#0d47a1);
+ color:#fff;padding:1.2rem;text-align:center
 }
 
-nav{
-  margin-top:.5rem;
-  display:flex;
-  justify-content:center;
-  gap:.5rem;
-  flex-wrap:wrap;
-}
-
+nav{margin-top:1rem;display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap}
 nav button{
-  border:none;
-  padding:.5rem .9rem;
-  border-radius:6px;
-  cursor:pointer;
+ border:none;border-radius:999px;padding:.6rem 1rem;font-weight:600
 }
 
 main{
-  max-width:1000px;
-  margin:2rem auto;
-  background:var(--card);
-  padding:2rem;
-  border-radius:14px;
-  box-shadow:0 4px 15px rgba(0,0,0,.2);
+ max-width:1200px;margin:2rem auto;background:var(--card);
+ padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.25)
 }
 
 section{display:none}
-section.visible{display:block}
+section.active{display:block}
 
 h2{color:var(--primary);margin-bottom:1rem}
 
-form{display:flex;flex-direction:column;gap:1rem}
-input,select,button{
-  padding:.7rem;
-  border-radius:6px;
-  border:1px solid #ccc;
+.card{
+ background:var(--bg);padding:1.5rem;border-radius:16px;
+ box-shadow:0 4px 15px rgba(0,0,0,.15);margin-top:1rem
 }
-button{
-  background:var(--primary);
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
+
+form{display:flex;flex-direction:column;gap:1rem}
+input,select{
+ padding:.8rem;border-radius:10px;border:1px solid #ccc
+}
+
+button.primary{
+ background:var(--primary);color:#fff;border:none;
+ padding:.9rem;border-radius:12px;font-weight:700
+}
+button.secondary{
+ background:transparent;border:2px solid var(--primary);
+ color:var(--primary);padding:.7rem;border-radius:12px
 }
 
 .ticket{
-  background:var(--bg);
-  padding:1rem;
-  border-radius:10px;
-  margin-top:1rem;
+ position:relative;margin-top:1rem
+}
+.badge{
+ position:absolute;top:1rem;right:1rem;
+ padding:.3rem .7rem;border-radius:999px;
+ font-size:.75rem;font-weight:700
 }
 
-footer{
-  text-align:center;
-  padding:1rem;
-  background:var(--primary);
-  color:#fff;
+.good{background:var(--good);color:#fff}
+.bad{background:var(--bad);color:#fff}
+
+#scanner{
+ background:#000;color:#0f0;font-family:monospace;
+ padding:1rem;border-radius:12px
 }
-.toggle{
-  position:fixed;
-  right:15px;
-  bottom:15px;
-  padding:.6rem;
-  border-radius:50%;
-  font-size:1.2rem;
+
+.toast{
+ position:fixed;bottom:20px;left:50%;
+ transform:translateX(-50%);
+ background:var(--primary);color:#fff;
+ padding:.8rem 1.2rem;border-radius:999px;
+ opacity:0;transition:.3s
+}
+.toast.show{opacity:1}
+
+.fab{
+ position:fixed;right:20px;bottom:20px;
+ width:50px;height:50px;border-radius:50%;
+ border:none;background:var(--accent);font-size:1.4rem
 }
 </style>
 </head>
@@ -104,19 +99,20 @@ footer{
 
 <header>
 <h1>🎢 FunPark</h1>
-<p>Statisches Ticketsystem – Demo</p>
+<p>Vollständiges statisches Ticketsystem</p>
 <nav>
-<button onclick="show('home')">Start</button>
-<button onclick="show('buy')">Kaufen</button>
-<button onclick="show('view')">Meine Tickets</button>
+<button onclick="go('home')">Start</button>
+<button onclick="go('buy')">Tickets</button>
+<button onclick="go('my')">Meine Tickets</button>
+<button onclick="go('scan')">Scanner-Login</button>
 </nav>
 </header>
 
 <main>
 
-<section id="home" class="visible">
+<section id="home" class="active">
 <h2>Willkommen</h2>
-<p>Buche dein Ticket, zahle sicher und speichere dein Ticket als PDF.</p>
+<div class="card">🎟️ Kaufen • 💳 Bezahlen • 📱 Scannen • ❌ Entwerten</div>
 </section>
 
 <section id="buy">
@@ -125,103 +121,129 @@ footer{
 <select id="user">
 <option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
 </select>
-
 <select id="ticket">
 <option value="Tagesticket|35">Tagesticket – 35€</option>
-<option value="2 Tage|60">2 Tage – 60€</option>
-<option value="Familie|90">Familie – 90€</option>
 <option value="VIP|150">VIP – 150€</option>
 </select>
-
-<button>Zur Zahlung 🔐</button>
+<button class="primary">Zur Zahlung 🔐</button>
 </form>
 </section>
 
-<section id="view">
+<section id="my">
 <h2>💳 Meine Tickets</h2>
 <select id="viewUser">
 <option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
 </select>
-<button onclick="showTickets()">Anzeigen</button>
-<div id="list"></div>
+<button class="secondary" onclick="loadTickets()">Anzeigen</button>
+<div id="ticketList"></div>
+</section>
+
+<section id="scan">
+<h2>🔐 Scanner-Login</h2>
+
+<div class="card">
+<input id="scanInput" placeholder="Ticketcode eingeben">
+<button class="primary" onclick="scanCode()">Ticket prüfen</button>
+</div>
+
+<div class="card">
+<div id="reader" style="width:100%"></div>
+</div>
+
+<div id="scanner"></div>
 </section>
 
 </main>
 
-<footer>© 2025 FunPark – Demo</footer>
-
-<button class="toggle" onclick="toggleDark()">🌙</button>
+<button class="fab" onclick="toggleDark()">🌙</button>
+<div class="toast" id="toast"></div>
 
 <script>
 let tickets=JSON.parse(localStorage.getItem("tickets"))||[];
 
-function show(id){
- document.querySelectorAll("section").forEach(s=>s.classList.remove("visible"));
- document.getElementById(id).classList.add("visible");
+function go(id){
+ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
 }
 
-/* ========== KAUF & ZAHLUNG ========== */
+/* ===== TOAST ===== */
+function toast(msg){
+ const t=document.getElementById("toast");
+ t.textContent=msg;t.classList.add("show");
+ setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+/* ===== BUY & PAYMENT ===== */
 buyForm.onsubmit=e=>{
  e.preventDefault();
  const [type,price]=ticket.value.split("|");
- const data={user:user.value,type,price};
- localStorage.setItem("pay",JSON.stringify(data));
+ localStorage.setItem("pending",JSON.stringify({user:user.value,type,price}));
  openPayment();
 };
 
 function openPayment(){
  const w=window.open("","_blank");
  w.document.write(`
- <h2>Sichere Zahlung 🔒</h2>
+ <h2>🔒 PayFun Secure</h2>
  <p id="info"></p>
- <progress value="0" max="100" id="p"></progress><br><br>
+ <progress max="100" value="0" id="p"></progress><br><br>
  <button onclick="pay()">Jetzt bezahlen</button>
-
  <script>
- const d=JSON.parse(localStorage.getItem("pay"));
- info.innerHTML=\`\${d.type} – <b>\${d.price}€</b>\`;
- let v=0;
- const i=setInterval(()=>{p.value=v+=10;if(v>=100)clearInterval(i)},200);
+ const d=JSON.parse(localStorage.getItem("pending"));
+ info.innerHTML=d.type+" – <b>"+d.price+"€</b>";
+ let v=0;const i=setInterval(()=>{p.value=v+=20;if(v>=100)clearInterval(i)},250);
  function pay(){
-  const code="TCK-"+Math.floor(100000+Math.random()*900000);
+  const code="TCK-"+crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
   const t=JSON.parse(localStorage.getItem("tickets"))||[];
   t.push({...d,code,redeemed:false});
   localStorage.setItem("tickets",JSON.stringify(t));
-  alert("Zahlung erfolgreich!");
+  alert("Zahlung erfolgreich");
   window.close();
  }
  <\/script>
  `);
 }
 
-/* ========== TICKETS ========== */
-function showTickets(){
- list.innerHTML="";
+/* ===== TICKETS ===== */
+function loadTickets(){
+ ticketList.innerHTML="";
  tickets=JSON.parse(localStorage.getItem("tickets"))||[];
  tickets.filter(t=>t.user===viewUser.value).forEach(t=>{
   const div=document.createElement("div");
-  div.className="ticket";
+  div.className="card ticket";
   div.innerHTML=`
-   <b>${t.code}</b><br>${t.type} – ${t.price}€<br>
+   <span class="badge ${t.redeemed?"bad":"good"}">
+    ${t.redeemed?"Entwertet":"Gültig"}
+   </span>
+   <b>${t.code}</b><br>${t.type} – ${t.price}€
    <div id="qr${t.code}"></div>
-   <button onclick="pdf('${t.code}','${t.type}','${t.price}')">PDF</button>
   `;
-  list.appendChild(div);
+  ticketList.appendChild(div);
   new QRCode(document.getElementById("qr"+t.code),t.code);
  });
 }
 
-/* ========== PDF ========== */
-function pdf(code,type,price){
- const {jsPDF}=window.jspdf;
- const d=new jsPDF();
- d.text("FunPark Ticket",20,20);
- d.text("Ticket: "+code,20,30);
- d.text(type+" – "+price+"€",20,40);
- d.save(code+".pdf");
+/* ===== SCANNER ===== */
+function scanCode(code){
+ if(!code) code=scanInput.value.trim();
+ const t=tickets.find(x=>x.code===code);
+ const out=document.getElementById("scanner");
+ if(!t){out.textContent="❌ Ticket ungültig";return;}
+ if(t.redeemed){out.textContent="⚠️ Ticket bereits entwertet";return;}
+ t.redeemed=true;
+ localStorage.setItem("tickets",JSON.stringify(tickets));
+ out.textContent="✅ Ticket akzeptiert & entwertet";
+ toast("Zutritt erlaubt");
 }
 
-/* ========== DARK MODE ========== */
+/* QR Kamera */
+new Html5Qrcode("reader").start(
+ {facingMode:"environment"},
+ {fps:10,qrbox:250},
+ txt=>scanCode(txt)
+);
+
+/* ===== DARK ===== */
 function toggleDark(){
  document.body.classList.toggle("dark");
 }
