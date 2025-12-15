@@ -1,191 +1,449 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎢 FunPark – Das ultimative Abenteuer!</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎢 FunPark – Vollständiges Ticketsystem</title>
+
+<!-- ================= EXTERNE LIBRARIES ================= -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<!-- ================= STYLE ================= -->
+<style>
+/* =======================================================
+   GLOBAL THEME
+======================================================= */
+:root{
+  --bg:#f4f6fa;
+  --card:#ffffff;
+  --primary:#1976d2;
+  --accent:#ff9800;
+  --text:#1f1f1f;
+  --muted:#666;
+  --success:#4caf50;
+  --error:#f44336;
+  --shadow:0 10px 35px rgba(0,0,0,.18);
+}
+
+body.dark{
+  --bg:#0f1115;
+  --card:#1c1f26;
+  --primary:#90caf9;
+  --accent:#ffb74d;
+  --text:#eaeaea;
+  --muted:#aaa;
+}
+
+/* =======================================================
+   BASE
+======================================================= */
+*{
+  box-sizing:border-box;
+  font-family:Montserrat,system-ui,sans-serif;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button{cursor:pointer}
+h1,h2,h3{font-weight:700}
+
+/* =======================================================
+   HEADER / NAV
+======================================================= */
+header{
+  background:linear-gradient(135deg,var(--primary),#0d47a1);
+  color:#fff;
+  padding:1.6rem;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+
+nav{
+  margin-top:1.2rem;
+  display:flex;
+  justify-content:center;
+  gap:.6rem;
+  flex-wrap:wrap;
+}
+
+nav button{
+  border:none;
+  padding:.6rem 1.1rem;
+  border-radius:999px;
+  font-weight:600;
+}
+
+/* =======================================================
+   MAIN LAYOUT
+======================================================= */
+main{
+  max-width:1200px;
+  margin:2.5rem auto;
+  padding:2rem;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+}
+
+section{display:none}
+section.active{display:block}
+
+/* =======================================================
+   COMPONENTS
+======================================================= */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;
+}
+
+.card{
+  background:var(--bg);
+  padding:1.6rem;
+  border-radius:18px;
+  box-shadow:0 4px 15px rgba(0,0,0,.15);
+}
+
+h2{color:var(--primary);margin-bottom:1rem}
+
+/* =======================================================
+   FORMS
+======================================================= */
+form{display:flex;flex-direction:column;gap:1rem}
+input,select{
+  padding:.8rem;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:1rem;
+}
+
+button.primary{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  padding:.9rem;
+  border-radius:12px;
+  font-weight:700;
+}
+
+button.secondary{
+  background:transparent;
+  border:2px solid var(--primary);
+  color:var(--primary);
+  padding:.7rem;
+  border-radius:12px;
+}
+
+/* =======================================================
+   TICKETS
+======================================================= */
+.ticket{
+  position:relative;
+}
+
+.badge{
+  position:absolute;
+  top:1rem;
+  right:1rem;
+  padding:.35rem .8rem;
+  border-radius:999px;
+  font-size:.75rem;
+  font-weight:700;
+}
+
+.valid{background:var(--success);color:#fff}
+.used{background:var(--error);color:#fff}
+
+/* =======================================================
+   SCANNER
+======================================================= */
+#gate{
+  height:190px;
+  border-radius:18px;
+  border:5px solid #ccc;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+  font-weight:700;
+  margin-bottom:1rem;
+}
+
+.gate-ok{border-color:var(--success);color:var(--success)}
+.gate-bad{border-color:var(--error);color:var(--error)}
+
+/* =======================================================
+   FLOATING BUTTON
+======================================================= */
+.fab{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  font-size:1.4rem;
+  box-shadow:var(--shadow);
+}
+</style>
 </head>
 
 <body>
-<!-- Zahlungsmodal -->
-<div id="paymentModal" class="modal" aria-hidden="true">
-  <div class="modal-content">
-    <button class="close" aria-label="Schließen">&times;</button>
-    <h2>💳 Zahlung über PayFun (Demo)</h2>
-    <div id="paymentInfo"></div>
 
-    <!-- Zahlungsformular (Demo, vorausgefüllt & gesperrt) -->
-    <form id="paymentForm">
-      <label for="cardName">Name auf Karte:</label>
-      <input type="text" id="cardName" value="Max Mustermann" readonly>
-
-      <label for="cardNumber">Kartennummer:</label>
-      <input type="text" id="cardNumber" value="1234 5678 9012 3456" readonly>
-
-      <label for="cardExpiry">Gültig bis:</label>
-      <input type="text" id="cardExpiry" value="12/25" readonly>
-
-      <label for="cardCVC">CVC:</label>
-      <input type="text" id="cardCVC" value="123" readonly>
-
-      <button type="submit">Zahlung durchführen ✅</button>
-    </form>
-
-    <div id="paymentResult"></div>
-  </div>
-</div>
-
-<!-- ================= HEADER ================= -->
+<!-- =======================================================
+     HEADER
+======================================================= -->
 <header>
-  <div class="logo-area">
-    <h1>🎢 FunPark</h1>
-    <p>Das ultimative Abenteuer für Groß & Klein!</p>
-  </div>
+  <h1>🎢 FunPark</h1>
+  <p>Vollständiges Ticketsystem – Informatik Abiturprojekt</p>
   <nav>
-    <button type="button" onclick="showSection('home')">🏠 Start</button>
-    <button type="button" onclick="showSection('buy')">🎟️ Tickets</button>
-    <button type="button" onclick="showSection('view')">💳 Ticket anzeigen</button>
-    <button type="button" onclick="showSection('redeem')">✅ Ticket einlösen</button>
-    <button type="button" onclick="showSection('gallery')">📸 Galerie</button>
-    <button type="button" onclick="showSection('faq')">❓ FAQ</button>
-    <button type="button" onclick="showSection('contact')">📬 Kontakt</button>
+    <button onclick="go('home')">Start</button>
+    <button onclick="go('shop')">Ticketshop</button>
+    <button onclick="go('my')">Meine Tickets</button>
+    <button onclick="go('scan')">Einlass</button>
+    <button onclick="go('admin')">Admin</button>
   </nav>
 </header>
 
-<!-- ================= MAIN ================= -->
+<!-- =======================================================
+     MAIN
+======================================================= -->
 <main>
-  <!-- 🏠 HOME -->
-  <section id="home" class="visible">
-    <div class="hero">
-      <h2>Willkommen im FunPark!</h2>
-      <p>Erlebe Nervenkitzel, Spaß und Abenteuer – an nur einem Ort. Egal ob Achterbahnen, Shows oder Wasserspaß – bei uns ist für alle etwas dabei!</p>
-      <button onclick="showSection('buy')" class="cta">Jetzt Ticket sichern 🎟️</button>
+
+<!-- ================= HOME ================= -->
+<section id="home" class="active">
+  <h2>Willkommen im FunPark</h2>
+  <div class="grid">
+    <div class="card">🎟️ Online Ticketshop</div>
+    <div class="card">💳 Zahlungssimulation</div>
+    <div class="card">📱 QR-Code Tickets</div>
+    <div class="card">🔐 Digitaler Einlass</div>
+    <div class="card">📄 PDF-Download</div>
+    <div class="card">📊 Admin-Statistiken</div>
+  </div>
+</section>
+
+<!-- ================= SHOP ================= -->
+<section id="shop">
+  <h2>🎟️ Ticket kaufen</h2>
+  <form id="buyForm">
+    <select id="user">
+      <option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
+    </select>
+
+    <select id="ticketType">
+      <option value="Tagesticket|35|1">Tagesticket – 35 €</option>
+      <option value="Wochenende|60|2">Wochenende – 60 €</option>
+      <option value="VIP|150|30">VIP – 150 €</option>
+    </select>
+
+    <button class="primary">Zur Zahlung</button>
+  </form>
+</section>
+
+<!-- ================= MY TICKETS ================= -->
+<section id="my">
+  <h2>💳 Meine Tickets</h2>
+  <select id="viewUser">
+    <option>Max</option><option>Anna</option><option>Tom</option><option>Lea</option>
+  </select>
+  <button class="secondary" onclick="loadTickets()">Anzeigen</button>
+  <div id="ticketList"></div>
+</section>
+
+<!-- ================= SCANNER ================= -->
+<section id="scan">
+  <h2>🔐 Einlasskontrolle</h2>
+  <div id="gate">🟡 Bereit</div>
+  <div class="card">
+    <input id="manualCode" placeholder="Ticketcode eingeben">
+    <button class="primary" onclick="validateTicket()">Prüfen</button>
+  </div>
+  <div class="card">
+    <div id="reader"></div>
+  </div>
+</section>
+
+<!-- ================= ADMIN ================= -->
+<section id="admin">
+  <h2>🛠️ Admin-Dashboard</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>🎟️ Tickets verkauft</h3>
+      <p id="statTickets">0</p>
     </div>
-
-    <div class="info-grid">
-      <article class="info-card">
-        <h3>🎢 Attraktionen</h3>
-        <p>Über 40 Fahrgeschäfte, darunter unsere legendäre Holzachterbahn „ThunderRide“ und das 4D-Erlebnis „Galaxy Flight“!</p>
-      </article>
-      <article class="info-card">
-        <h3>🍔 Gastronomie</h3>
-        <p>Von Burgern bis Veggie Bowls – entdecke über 20 Restaurants & Snackbars im gesamten Park.</p>
-      </article>
-      <article class="info-card">
-        <h3>👨‍👩‍👧‍👦 Familienfreundlich</h3>
-        <p>Kinderbereiche, Familien-Tickets und Wickelstationen – der Spaß für die ganze Familie!</p>
-      </article>
+    <div class="card">
+      <h3>💰 Umsatz</h3>
+      <p id="statRevenue">0 €</p>
     </div>
-  </section>
-
-  <!-- 🎟️ TICKET KAUFEN -->
-  <section id="buy">
-    <h2>🎟️ Ticket kaufen</h2>
-    <form id="buyForm">
-      <label for="userSelect">Benutzername:</label>
-      <select id="userSelect"></select>
-
-      <label for="ticketType">Ticket-Typ:</label>
-      <select id="ticketType">
-        <option value="Tagesticket">Tagesticket – 35€</option>
-        <option value="2-Tage-Ticket">2-Tage-Ticket – 60€</option>
-        <option value="Familien-Ticket">Familien-Ticket – 90€</option>
-        <option value="VIP-Ticket">VIP-Ticket – 150€ (mit Fast Lane)</option>
-      </select>
-
-      <label for="paymentMethod">Zahlungsmethode:</label>
-      <select id="paymentMethod">
-        <option value="Kreditkarte">Kreditkarte</option>
-        <option value="PayPal">PayPal</option>
-        <option value="EC-Karte">EC-Karte</option>
-      </select>
-
-      <button type="submit">Ticket kaufen 💳</button>
-    </form>
-    <div id="buyMessage" class="message" role="status"></div>
-  </section>
-
-  <!-- 💳 TICKET ANZEIGEN -->
-  <section id="view">
-    <h2>💳 Ticket anzeigen</h2>
-    <form id="viewForm">
-      <label for="userSelectView">Benutzername:</label>
-      <select id="userSelectView"></select>
-      <button type="submit">Anzeigen</button>
-    </form>
-    <div id="ticketList" role="region" aria-live="polite"></div>
-  </section>
-
-  <!-- ✅ TICKET EINLÖSEN -->
-  <section id="redeem">
-    <h2>✅ Ticket einlösen</h2>
-    <form id="redeemForm">
-      <label for="ticketCode">Ticketnummer eingeben:</label>
-      <input type="text" id="ticketCode" placeholder="z. B. TCK-123456" required>
-      <button type="submit">Einlösen</button>
-    </form>
-    <div id="redeemMessage" class="message" role="status"></div>
-  </section>
-
-  <!-- 📸 GALERIE -->
-  <section id="gallery">
-    <h2>📸 Eindrücke aus dem FunPark</h2>
-    <div class="gallery-grid">
-      <img src="https://source.unsplash.com/400x250/?rollercoaster" alt="Achterbahn">
-      <img src="https://source.unsplash.com/400x250/?themepark" alt="Freizeitpark">
-      <img src="https://source.unsplash.com/400x250/?ferriswheel" alt="Riesenrad">
-      <img src="https://source.unsplash.com/400x250/?waterpark" alt="Wasserrutsche">
-      <img src="https://source.unsplash.com/400x250/?children,fun" alt="Familienbereich">
-      <img src="https://source.unsplash.com/400x250/?fireworks,night" alt="Abendshow">
+    <div class="card">
+      <h3>🚪 Einlässe heute</h3>
+      <p id="statEntries">0</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ❓ FAQ -->
-  <section id="faq">
-    <h2>❓ Häufige Fragen</h2>
-    <details>
-      <summary>Kann ich Tickets stornieren?</summary>
-      <p>Nein, bereits gekaufte Tickets sind vom Umtausch ausgeschlossen, können aber auf andere Personen übertragen werden.</p>
-    </details>
-    <details>
-      <summary>Gibt es Parkplätze?</summary>
-      <p>Ja, wir haben über 2000 kostenlose Parkplätze direkt am Eingang!</p>
-    </details>
-    <details>
-      <summary>Darf ich Essen mitbringen?</summary>
-      <p>Ja, du darfst eigene Snacks mitbringen – bitte achte nur auf Mülltrennung und Sauberkeit.</p>
-    </details>
-  </section>
-
-  <!-- 📬 KONTAKT -->
-  <section id="contact">
-    <h2>📬 Kontakt & Support</h2>
-    <form id="contactForm">
-      <label for="contactName">Dein Name:</label>
-      <input type="text" id="contactName" required>
-
-      <label for="contactEmail">E-Mail:</label>
-      <input type="email" id="contactEmail" required>
-
-      <label for="contactMessageInput">Nachricht:</label>
-      <textarea id="contactMessageInput" rows="5" required></textarea>
-
-      <button type="submit">Nachricht senden 📧</button>
-    </form>
-    <div id="contactMessage" class="message" role="status"></div>
-  </section>
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer>
-  <p>© 2025 FunPark – Freizeitpark Ticketsystem (Demo)</p>
-  <p><small>Diese Seite ist rein statisch und dient nur zu Demonstrationszwecken.</small></p>
-</footer>
+<button class="fab" onclick="toggleDark()">🌙</button>
 
-<script src="script.js"></script>
+<!-- =======================================================
+     SCRIPT
+======================================================= -->
+<script>
+/* =======================================================
+   STATE MANAGEMENT
+======================================================= */
+function getTickets(){
+  return JSON.parse(localStorage.getItem("tickets")) || [];
+}
+function saveTickets(t){
+  localStorage.setItem("tickets",JSON.stringify(t));
+}
+
+/* =======================================================
+   NAVIGATION
+======================================================= */
+function go(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(id==="scan") startScanner();
+  if(id==="admin") loadStats();
+}
+
+/* =======================================================
+   DARK MODE
+======================================================= */
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
+
+/* =======================================================
+   BUY FLOW
+======================================================= */
+buyForm.onsubmit=e=>{
+  e.preventDefault();
+  const [type,price,days]=ticketType.value.split("|");
+  const code="FP-"+Math.random().toString(36).substr(2,8).toUpperCase();
+  const now=new Date();
+  const validUntil=new Date(now.getTime()+days*86400000);
+
+  const t=getTickets();
+  t.push({
+    user:user.value,
+    type,
+    price:Number(price),
+    code,
+    validUntil:validUntil.toISOString(),
+    lastUsed:null,
+    paidAt:now.toISOString()
+  });
+  saveTickets(t);
+  alert("Zahlung erfolgreich!\nTicket-Code: "+code);
+};
+
+/* =======================================================
+   LOAD TICKETS
+======================================================= */
+function loadTickets(){
+  const t=getTickets();
+  ticketList.innerHTML="";
+  t.filter(x=>x.user===viewUser.value).forEach(x=>{
+    const expired=new Date(x.validUntil)<new Date();
+    const d=document.createElement("div");
+    d.className="card ticket";
+    d.innerHTML=`
+      <span class="badge ${expired?"used":"valid"}">
+        ${expired?"ABGELAUFEN":"GÜLTIG"}
+      </span>
+      <b>${x.code}</b><br>
+      ${x.type} – ${x.price} €<br>
+      Gültig bis: ${new Date(x.validUntil).toLocaleDateString()}
+      <div id="qr${x.code}"></div>
+      <button class="secondary" onclick="downloadPDF('${x.code}')">PDF</button>
+    `;
+    ticketList.appendChild(d);
+    new QRCode(document.getElementById("qr"+x.code),x.code);
+  });
+}
+
+/* =======================================================
+   PDF EXPORT
+======================================================= */
+function downloadPDF(code){
+  const t=getTickets().find(x=>x.code===code);
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF();
+  pdf.text("FunPark Ticket",20,20);
+  pdf.text("Code: "+t.code,20,35);
+  pdf.text("Typ: "+t.type,20,45);
+  pdf.text("Gültig bis: "+new Date(t.validUntil).toLocaleDateString(),20,55);
+  pdf.save("Ticket-"+t.code+".pdf");
+}
+
+/* =======================================================
+   SCANNER
+======================================================= */
+let scanner=null;
+function startScanner(){
+  if(scanner) return;
+  scanner=new Html5Qrcode("reader");
+  scanner.start({facingMode:"environment"},{fps:10,qrbox:250},
+    code=>validateTicket(code)
+  );
+}
+
+function validateTicket(code){
+  const gate=document.getElementById("gate");
+  const t=getTickets();
+  const ticket=t.find(x=>x.code===(code||manualCode.value.trim()));
+  if(!ticket){
+    gate.className="gate-bad";
+    gate.textContent="❌ Ungültig";
+    return;
+  }
+  if(new Date(ticket.validUntil)<new Date()){
+    gate.className="gate-bad";
+    gate.textContent="⛔ Abgelaufen";
+    return;
+  }
+  const today=new Date().toDateString();
+  if(ticket.lastUsed===today){
+    gate.className="gate-bad";
+    gate.textContent="⚠️ Heute bereits genutzt";
+    return;
+  }
+  ticket.lastUsed=today;
+  saveTickets(t);
+  gate.className="gate-ok";
+  gate.textContent="✅ Zutritt erlaubt";
+}
+
+/* =======================================================
+   ADMIN STATS
+======================================================= */
+function loadStats(){
+  const t=getTickets();
+  document.getElementById("statTickets").textContent=t.length;
+  document.getElementById("statRevenue").textContent=
+    t.reduce((s,x)=>s+x.price,0)+" €";
+  document.getElementById("statEntries").textContent=
+    t.filter(x=>x.lastUsed===new Date().toDateString()).length;
+}
+</script>
+
 </body>
 </html>
