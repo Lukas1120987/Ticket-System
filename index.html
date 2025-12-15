@@ -334,26 +334,107 @@ if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
 /* =======================================================
    BUY FLOW
 ======================================================= */
-buyForm.onsubmit=e=>{
-  e.preventDefault();
-  const [type,price,days]=ticketType.value.split("|");
-  const code="FP-"+Math.random().toString(36).substr(2,8).toUpperCase();
-  const now=new Date();
-  const validUntil=new Date(now.getTime()+days*86400000);
 
-  const t=getTickets();
-  t.push({
-    user:user.value,
+let pendingPayment = null;
+
+buyForm.onsubmit = e => {
+  e.preventDefault();
+
+  const [type, price, days] = ticketType.value.split("|");
+
+  // Zahlungsdaten zwischenspeichern
+  pendingPayment = {
+    user: user.value,
     type,
-    price:Number(price),
-    code,
-    validUntil:validUntil.toISOString(),
-    lastUsed:null,
-    paidAt:now.toISOString()
-  });
-  saveTickets(t);
-  alert("Zahlung erfolgreich!\nTicket-Code: "+code);
+    price: Number(price),
+    days: Number(days)
+  };
+
+  // Zahlungsseite aufbauen & anzeigen
+  showPaymentPage();
 };
+
+function showPaymentPage() {
+  go("shop"); // sicherstellen, dass wir im main bleiben
+
+  // alte Seite entfernen, falls vorhanden
+  const old = document.getElementById("paymentPage");
+  if (old) old.remove();
+
+  const section = document.createElement("section");
+  section.id = "paymentPage";
+  section.className = "active";
+
+  section.innerHTML = `
+    <h2>💳 Zahlung abschließen</h2>
+    <div class="card">
+      <p><b>Kunde:</b> ${pendingPayment.user}</p>
+      <p><b>Ticket:</b> ${pendingPayment.type}</p>
+      <p><b>Preis:</b> ${pendingPayment.price} €</p>
+
+      <hr><br>
+
+      <label>Zahlungsmethode</label>
+      <select id="paymentMethod">
+        <option>Kreditkarte</option>
+        <option>PayPal</option>
+        <option>Apple / Google Pay</option>
+      </select>
+
+      <input placeholder="Kartennummer / Account" disabled>
+
+      <br><br>
+      <button class="primary" onclick="pay()">Jetzt bezahlen</button>
+      <button class="secondary" onclick="go('shop')">Abbrechen</button>
+    </div>
+  `;
+
+  document.querySelector("main").appendChild(section);
+
+  // andere Sections ausblenden
+  document.querySelectorAll("main section").forEach(s => {
+    if (s.id !== "paymentPage") s.classList.remove("active");
+  });
+}
+
+function pay() {
+  if (!pendingPayment) {
+    alert("Keine Zahlung vorbereitet.");
+    return;
+  }
+
+  // Ticket erzeugen
+  const code = "FP-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+  const now = new Date();
+  const validUntil = new Date(
+    now.getTime() + pendingPayment.days * 86400000
+  );
+
+  const ticket = {
+    user: pendingPayment.user,
+    type: pendingPayment.type,
+    price: pendingPayment.price,
+    code: code,
+    validUntil: validUntil.toISOString(),
+    lastUsed: null,
+    paidAt: now.toISOString(),
+    paymentMethod: document.getElementById("paymentMethod").value
+  };
+
+  const tickets = getTickets();
+  tickets.push(ticket);
+  saveTickets(tickets);
+
+  pendingPayment = null;
+
+  alert(
+    "✅ Zahlung erfolgreich!\n\n" +
+    "Ticket-Code: " + code
+  );
+
+  go("my");
+}
+
 
 /* =======================================================
    LOAD TICKETS
