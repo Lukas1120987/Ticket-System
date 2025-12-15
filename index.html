@@ -335,29 +335,32 @@ if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
    BUY FLOW
 ======================================================= */
 
+/* =======================================================
+   PAYMENT SYSTEM – KOMPLETT
+======================================================= */
+
 let pendingPayment = null;
 
+/* ================= START PAYMENT ================= */
 buyForm.onsubmit = e => {
   e.preventDefault();
 
   const [type, price, days] = ticketType.value.split("|");
 
-  // Zahlungsdaten zwischenspeichern
   pendingPayment = {
     user: user.value,
     type,
     price: Number(price),
-    days: Number(days)
+    days: Number(days),
+    status: "offen",
+    createdAt: new Date().toISOString()
   };
 
-  // Zahlungsseite aufbauen & anzeigen
   showPaymentPage();
 };
 
+/* ================= PAYMENT PAGE ================= */
 function showPaymentPage() {
-  go("shop"); // sicherstellen, dass wir im main bleiben
-
-  // alte Seite entfernen, falls vorhanden
   const old = document.getElementById("paymentPage");
   if (old) old.remove();
 
@@ -381,29 +384,22 @@ function showPaymentPage() {
         <option>Apple / Google Pay</option>
       </select>
 
-      <input placeholder="Kartennummer / Account" disabled>
-
       <br><br>
       <button class="primary" onclick="pay()">Jetzt bezahlen</button>
-      <button class="secondary" onclick="go('shop')">Abbrechen</button>
+      <button class="secondary" onclick="cancelPayment()">Abbrechen</button>
     </div>
   `;
 
   document.querySelector("main").appendChild(section);
 
-  // andere Sections ausblenden
-  document.querySelectorAll("main section").forEach(s => {
-    if (s.id !== "paymentPage") s.classList.remove("active");
-  });
+  document.querySelectorAll("main section")
+    .forEach(s => s.id !== "paymentPage" && s.classList.remove("active"));
 }
 
+/* ================= PAY ================= */
 function pay() {
-  if (!pendingPayment) {
-    alert("Keine Zahlung vorbereitet.");
-    return;
-  }
+  if (!pendingPayment) return;
 
-  // Ticket erzeugen
   const code = "FP-" + Math.random().toString(36).substr(2, 8).toUpperCase();
   const now = new Date();
   const validUntil = new Date(
@@ -414,27 +410,60 @@ function pay() {
     user: pendingPayment.user,
     type: pendingPayment.type,
     price: pendingPayment.price,
-    code: code,
+    code,
     validUntil: validUntil.toISOString(),
     lastUsed: null,
     paidAt: now.toISOString(),
-    paymentMethod: document.getElementById("paymentMethod").value
+    paymentMethod: paymentMethod.value,
+    status: "bezahlt"
   };
 
   const tickets = getTickets();
   tickets.push(ticket);
   saveTickets(tickets);
 
+  downloadInvoice(ticket);
+
   pendingPayment = null;
 
-  alert(
-    "✅ Zahlung erfolgreich!\n\n" +
-    "Ticket-Code: " + code
-  );
-
+  alert("✅ Zahlung erfolgreich!\nTicket-Code: " + code);
   go("my");
 }
 
+/* ================= CANCEL PAYMENT ================= */
+function cancelPayment() {
+  if (pendingPayment) {
+    pendingPayment.status = "storniert";
+    pendingPayment = null;
+  }
+
+  const page = document.getElementById("paymentPage");
+  if (page) page.remove();
+
+  alert("❌ Zahlung abgebrochen");
+  go("shop");
+}
+
+/* ================= INVOICE PDF ================= */
+function downloadInvoice(ticket) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  pdf.setFontSize(18);
+  pdf.text("FunPark – Rechnung", 20, 20);
+
+  pdf.setFontSize(12);
+  pdf.text("Kunde: " + ticket.user, 20, 40);
+  pdf.text("Ticket: " + ticket.type, 20, 50);
+  pdf.text("Ticket-Code: " + ticket.code, 20, 60);
+  pdf.text("Preis: " + ticket.price + " €", 20, 70);
+  pdf.text("Zahlungsmethode: " + ticket.paymentMethod, 20, 80);
+  pdf.text("Zahlungsdatum: " + new Date(ticket.paidAt).toLocaleString(), 20, 90);
+
+  pdf.text("Status: BEZAHLT", 20, 110);
+
+  pdf.save("Rechnung-" + ticket.code + ".pdf");
+}
 
 /* =======================================================
    LOAD TICKETS
